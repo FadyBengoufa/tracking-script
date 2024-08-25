@@ -5,40 +5,21 @@
     return params.get(name);
   }
 
-  // Function to store affiliate_id in local storage or cookies
+  // Function to store affiliate_id in cookies
   function storeAffiliateId(id) {
-    if (typeof Storage !== "undefined") {
-      localStorage.setItem("affiliate_id", id);
-    } else {
-      document.cookie = `affiliate_id=${id}; path=/`;
-    }
-  }
-
-  // Function to retrieve stored affiliate_id
-  function getStoredAffiliateId() {
-    if (typeof Storage !== "undefined") {
-      return localStorage.getItem("affiliate_id");
-    } else {
-      const match = document.cookie.match(
-        new RegExp("(^| )affiliate_id=([^;]+)")
-      );
-      return match ? match[2] : null;
-    }
+    document.cookie = `affiliate_id=${id}; path=/; Secure`;
   }
 
   // Function to send event data to your API
   function sendEventToApi(eventType, eventData) {
-    const affiliateId = getStoredAffiliateId();
-    console.log("sending event to API....", affiliateId);
-    
-    fetch("https://your-api.com/track", {
+    fetch("http://localhost:8080/api/track", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
         event: eventType,
-        affiliateId: affiliateId,
         ...eventData,
         url: window.location.href,
         userAgent: navigator.userAgent,
@@ -46,7 +27,7 @@
       }),
     })
       .then((response) => response.json())
-      .then((data) => console.log("Event tracked:", data))
+      .then((data) => console.log(data))
       .catch((error) => console.error("Error tracking event:", error));
   }
 
